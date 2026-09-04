@@ -1,0 +1,7 @@
+RewriteEngine On
+
+# Redireciona todos os pedidos para index.php mantendo o PATH_INFO
+# Necessário para o router funcionar em Apache
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L,QSA]

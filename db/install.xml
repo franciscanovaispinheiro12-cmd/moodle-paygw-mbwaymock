@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+  NOTA: O Moodle adiciona automaticamente o prefixo 'mdl_' ao nome da tabela.
+  → A tabela ficará como: mdl_paygw_mbwaymock_transactions
+-->
+<XMLDB PATH="payment/gateway/mbwaymock/db" VERSION="20250514"
+       COMMENT="MBWay Mock Payment Gateway — tabela de transações">
+  <TABLES>
+
+    <TABLE NAME="paygw_mbwaymock_transactions"
+           COMMENT="Registo de cada tentativa de pagamento MBWay Mock">
+      <FIELDS>
+
+        <!-- id: chave primária, auto-incremento -->
+        <FIELD NAME="id" TYPE="int" LENGTH="10"
+               NOTNULL="true" SEQUENCE="true"
+               COMMENT="Primary key"/>
+
+        <!-- userid: quem fez o pagamento — referencia mdl_user -->
+        <FIELD NAME="userid" TYPE="int" LENGTH="10"
+               NOTNULL="true" SEQUENCE="false"
+               COMMENT="FK to mdl_user.id — aluno que iniciou o pagamento"/>
+
+        <!-- component: plugin Moodle que pediu o pagamento (ex: enrol_fee) -->
+        <FIELD NAME="component" TYPE="char" LENGTH="100"
+               NOTNULL="true" SEQUENCE="false"
+               COMMENT="Componente Moodle que pediu o pagamento"/>
+
+        <!-- paymentarea: sub-área do componente (ex: fee) -->
+        <FIELD NAME="paymentarea" TYPE="char" LENGTH="100"
+               NOTNULL="true" SEQUENCE="false"
+               COMMENT="Área de pagamento dentro do componente"/>
+
+        <!-- itemid: ID do curso (ou outro item) a pagar -->
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10"
+               NOTNULL="true" SEQUENCE="false"
+               COMMENT="ID do item a pagar (ex: ID do curso)"/>
+
+        <!-- txn_ref: referência única gerada pelo plugin (ex: MBW-A1B2C3)
+             Liga o pedido de pagamento à resposta do webhook -->
+        <FIELD NAME="txn_ref" TYPE="char" LENGTH="50"
+               NOTNULL="true" SEQUENCE="false"
+               COMMENT="Referência única da transação"/>
+
+        <!-- amount: valor a pagar (ex: 50.00) -->
+        <FIELD NAME="amount" TYPE="number" LENGTH="10" DECIMALS="2"
+               NOTNULL="true" SEQUENCE="false"
+               COMMENT="Montante do pagamento"/>
+
+        <!-- currency: moeda ISO 4217 (EUR para Portugal) -->
+        <FIELD NAME="currency" TYPE="char" LENGTH="3"
+               NOTNULL="true" SEQUENCE="false" DEFAULT="EUR"
+               COMMENT="Código de moeda ISO 4217"/>
+
+        <!-- status: estado atual da transação
+             Começa como 'pending', atualizado pelo webhook para 'success' ou 'failed' -->
+        <FIELD NAME="status" TYPE="char" LENGTH="20"
+               NOTNULL="true" SEQUENCE="false" DEFAULT="pending"
+               COMMENT="Estado: pending | success | failed"/>
+
+        <!-- payload: resposta JSON completa do webhook — guardada para auditoria -->
+        <FIELD NAME="payload" TYPE="text"
+               NOTNULL="false" SEQUENCE="false"
+               COMMENT="Resposta JSON completa do webhook (auditoria)"/>
+
+        <!-- timecreated: quando o pagamento foi iniciado -->
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10"
+               NOTNULL="true" SEQUENCE="false"
+               COMMENT="Timestamp Unix de criação"/>
+
+        <!-- timemodified: quando o estado foi atualizado pela última vez -->
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10"
+               NOTNULL="true" SEQUENCE="false"
+               COMMENT="Timestamp Unix da última alteração"/>
+
+      </FIELDS>
+      <KEYS>
+        <!-- Chave primária obrigatória em todas as tabelas Moodle -->
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+
+        <!-- Chave estrangeira para mdl_user — integridade referencial -->
+        <KEY NAME="fk_userid" TYPE="foreign" FIELDS="userid"
+             REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <!-- Índice ÚNICO em txn_ref: garante que não existem duas transações
+             com a mesma referência — protege contra duplicados no webhook -->
+        <INDEX NAME="idx_txn_ref" UNIQUE="true" FIELDS="txn_ref"/>
+
+        <!-- Índice em status: acelera queries do tipo "listar todas as pendentes" -->
+        <INDEX NAME="idx_status" UNIQUE="false" FIELDS="status"/>
+
+        <!-- Índice em userid: acelera histórico de pagamentos por aluno -->
+        <INDEX NAME="idx_userid" UNIQUE="false" FIELDS="userid"/>
+      </INDEXES>
+    </TABLE>
+
+  </TABLES>
+</XMLDB>

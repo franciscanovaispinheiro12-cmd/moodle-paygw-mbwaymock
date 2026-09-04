@@ -1,0 +1,65 @@
+{{!
+    Template Mustache: payment_method
+    Plugin: paygw_mbwaymock
+    Descrição: Formulário de pagamento MBWay mostrado ao aluno no modal de pagamento.
+    Renderizado por: amd/src/gateways.js → showPaymentModal()
+
+    Contexto esperado:
+    - description {string} Descrição do pagamento (ex: "Inscrição no curso PHP Avançado")
+}}
+<div class="paygw-mbwaymock-container">
+
+    {{! Cabeçalho com identidade visual MBWay }}
+    <div class="text-center mb-4">
+        <div class="paygw-mbwaymock-logo mb-2">
+            <span style="font-size:2rem; font-weight:800; color:#E40046; letter-spacing:-1px;">MB</span><span style="font-size:2rem; font-weight:800; color:#003087; letter-spacing:-1px;">WAY</span>
+            <span class="badge badge-warning ml-1" style="font-size:0.6rem; vertical-align:super;">MOCK</span>
+        </div>
+        <p class="text-muted">
+            <small>{{description}}</small>
+        </p>
+    </div>
+
+    {{! Campo do número de telemóvel }}
+    <div class="form-group">
+        <label for="paygw-mbway-phone" class="font-weight-bold">
+            {{#str}} phone_number, paygw_mbwaymock {{/str}}
+        </label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    🇵🇹 +351
+                </span>
+            </div>
+            <input
+                type="tel"
+                id="paygw-mbway-phone"
+                data-region="mbway-phone"
+                class="form-control form-control-lg"
+                placeholder="912 345 678"
+                pattern="[0-9]{9}"
+                maxlength="9"
+                autocomplete="tel-national"
+                inputmode="numeric"
+            />
+        </div>
+        <small class="form-text text-muted">
+            {{#str}} phone_number_help, paygw_mbwaymock {{/str}}
+        </small>
+    </div>
+
+    {{! Aviso de ambiente de simulação }}
+    <div class="alert alert-info d-flex align-items-start" role="alert">
+        <span class="mr-2" style="font-size:1.2rem;">ℹ️</span>
+        <div>
+            <strong>{{#str}} mock_info_title, paygw_mbwaymock {{/str}}</strong><br>
+            <small>{{#str}} mock_info, paygw_mbwaymock {{/str}}</small>
+        </div>
+    </div>
+
+    {{! Instrução ao aluno }}
+    <p class="text-center text-muted small">
+        {{#str}} payment_instruction, paygw_mbwaymock {{/str}}
+    </p>
+
+</div>
